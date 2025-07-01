@@ -13,9 +13,9 @@ function App() {
           <Typography variant="h2">Planner</Typography>
           <p>login</p>
         </Grid>
-        <Grid container direction="row" spacing={3} sx={{ width: '100%', height: '86vh' }}>
+        <Grid container direction="row" spacing={3} sx={{ width: '100%', height: '86vh', maxHeight: '100%' }}>
           <Grid size={2}>
-            <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9' }}>
+            <Paper sx={{ width: '100%', height: '100%', maxHeight: '100%', backgroundColor: '#d9d9d9', overflow: 'auto' }}>
               <Weken week={week} setWeek={setWeek}/>
             </Paper>
           </Grid>

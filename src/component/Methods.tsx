@@ -13,3 +13,7 @@ export const getDayOfWeek = (week: number, day: number, year?: number) => {
     result.setDate(mondayOfWeek1.getDate() + (week - 1) * 7 + day+1);
     return result;
 }
+
+export const weekFormat = (week: number) => {
+    return week < 1 ? week+ 52 : week > 52 ? week-52 : week; 
+}
