@@ -1,6 +1,10 @@
 import { Grid, Paper, Typography } from "@mui/material"
+import Weken from "./component/Weken"
+import { useState } from "react";
+import { getWeek } from "./component/Methods";
 
 function App() {
+  const [week, setWeek] = useState(getWeek(new Date));
 
   return (
     <Paper sx={{ maxHeight: '100vh', maxWidth: '100vw', height: '98vh', padding: 0, margin: 0 }}>
@@ -12,7 +16,7 @@ function App() {
         <Grid container direction="row" spacing={3} sx={{ width: '100%', height: '86vh' }}>
           <Grid size={2}>
             <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9' }}>
-              <Typography variant="h3" sx={{width: '100%', textAlign: 'center', padding: '0.3em 0 0 0'}}>Weken</Typography>
+              <Weken week={week} setWeek={setWeek}/>
             </Paper>
           </Grid>
           <Grid size={10} container direction="column" spacing={3}>
