@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
-import { db, auth } from "../firebase";
+import { db, auth } from "./firebase";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
