@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Backdrop, Box, Button, Paper, Typography } from "@mui/material";
+import { Backdrop, Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Typography } from "@mui/material";
 import { setDoc, doc, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { TimePicker } from "@mui/x-date-pickers";
@@ -13,35 +13,50 @@ type Raster = {
     }[]
 }
 
+
 const Raster = () => {
   const [raster, setRaster] = useState<Raster>();
   const [open, setOpen] = useState(false);
   const [start, setStart] = useState<Dayjs | null>(dayjs());
   const [end, setEnd] = useState<Dayjs | null>(dayjs());
+  const [day, setDay] = useState(0);
+  const [loaded, setLoaded] = useState(false);
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const uid = localStorage.uid;
 
-  const getRaster = async () => {
-    try {
-        await getDoc(doc(db, "users", uid, "raster")).then((rasterData) => {
-        if (rasterData.exists()) setRaster(rasterData.data() as Raster);});
-    } catch (error: any) {
-      console.error("error:", error);
-    }
-  }
-  useEffect(() => {
-    getRaster();
-  },[])
-
   const updateRaster = async () => {
     try {
-      await setDoc(doc(db, "users", uid, "raster"), {
-        ...raster
-      });
+      await setDoc(
+        doc(db, "users", uid),
+        { raster: raster?.items || [] },
+        { merge: true }
+      );
     } catch (error: any) {
       console.error("error:", error);
     }
   };
+
+  useEffect(() => {
+    if (loaded) updateRaster();
+  },[raster]);
+
+  const getRaster = async () => {
+    try {
+        await getDoc(doc(db, "users", uid)).then((userData) => {
+        if (userData.exists()) {
+          const data = (userData.data()) as {raster: {start: Timestamp; end: Timestamp; day: number;}[]};
+          (data.raster) = data.raster.sort((a, b) => a.start.seconds - b.start.seconds);
+          setRaster({ items: data.raster });
+        }});
+    } catch (error: any) {
+      console.error("error:", error);
+    }
+  }
+
+  useEffect(() => {
+    getRaster();
+    setLoaded(true);
+  },[]);
 
   return (
     <>
@@ -54,16 +69,25 @@ const Raster = () => {
                     <div key={index}>
                         <Typography>{day}</Typography>
                         {raster?.items.filter(i => i.day === index).map((item, id) => (
-                        <div key={id} style={{ padding: "10px", border: "1px solid #ccc", margin: "5px 0" }}>
+                        <div key={id} style={{ padding: "0 10px", border: "1px solid #ccc", margin: "3px 0" }}>
                             <p>Start: {item.start.toDate().toLocaleTimeString()}</p>
                             <p>End: {item.end.toDate().toLocaleTimeString()}</p>
                         </div>
                         ))}
                     </div>))}
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+                <Box display={'flex'} justifyContent={'space-between'} mt={2} maxWidth={500} flexWrap={'wrap'}>
                     <TimePicker value={start} onChange={(value) => setStart(value)} />
                     <TimePicker value={end} onChange={(value) => setEnd(value)} />
+                    <FormControl fullWidth>
+                        <InputLabel id="day-select-label">Day</InputLabel>
+                        <Select labelId="day-select-label" id="day-select" value={day} label="Day" onChange={(e) => setDay(e.target.value)}> 
+                            {days.map((day, index) => <MenuItem value={index}>{day}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                    <Button onClick={() => { (start && end) && setRaster(prev => ({ items: [...(prev?.items || []),{start: Timestamp.fromDate(start.toDate()),end: Timestamp.fromDate(end.toDate()),day}]}))}}>
+                      Add time frame
+                    </Button>
                 </Box>
             </Paper>
         </Backdrop>
