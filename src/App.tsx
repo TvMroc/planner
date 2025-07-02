@@ -27,7 +27,7 @@ function App() {
             <Grid>
               <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9', minHeight: '20vh' }} />
             </Grid>
-            <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Grid sx={{ flexGrow: 1, maxWidth: '81.6vw' }}>
               <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9', overflow: 'hidden', display: 'flex', flexDirection: 'column'}} >
                 <PlanBoard week={week} />
               </Paper>
