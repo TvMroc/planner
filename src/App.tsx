@@ -28,7 +28,7 @@ function App() {
             </Grid>
             <Grid size={10} container direction="column" spacing={3}>
               <Grid sx={{ maxWidth: '80.8vw' }}>
-                <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9', minHeight: '20vh', p: 1 }}>
+                <Paper sx={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9', overflow: 'hidden', display: 'flex', flexDirection: 'column', p: 1 }}>
                   <OpdrachtPanel />
                 </Paper>
               </Grid>
