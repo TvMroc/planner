@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Paper, Typography, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import React, { useState, useEffect, forwardRef } from "react";
+import { Box, Button, Paper, Typography, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, MenuItem, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { db, auth } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -19,17 +19,27 @@ interface PlanCard {
   deadline: string;
 }
 
+interface OpdrachtCard {
+  id: string;
+  title: string;
+  content: string;
+  deadline: string;
+}
+
 interface PlanBoardProps {
   week: number;
 }
 
-export default function PlanBoard({ week }: PlanBoardProps) {
+const PlanBoard = forwardRef(function PlanBoard({ week }: PlanBoardProps, ref) {
   const [cards, setCards] = useState<PlanCard[][]>([[], [], [], [], [], [], []]);
   const [open, setOpen] = useState(false);
   const [currentDay, setCurrentDay] = useState(0);
   const [form, setForm] = useState({ title: "", content: "", time: "", deadline: "" });
   const [uid, setUid] = useState<string | null>(null);
   const [editIdx, setEditIdx] = useState<number | null>(null);
+
+  const [opdrachtList, setOpdrachtList] = useState<OpdrachtCard[]>([]);
+  const [showOpdrachtSelect, setShowOpdrachtSelect] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -53,6 +63,16 @@ export default function PlanBoard({ week }: PlanBoardProps) {
     fetchPlans();
   }, [uid, week]);
 
+  const fetchOpdrachten = async () => {
+    const querySnapshot = await getDocs(collection(db, "opdrachten"));
+    const list: OpdrachtCard[] = [];
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      list.push({ id: docSnap.id, title: data.title, content: data.content, deadline: data.deadline });
+    });
+    setOpdrachtList(list);
+  };
+
   const savePlansToFirestore = async (newCards: PlanCard[][]) => {
     if (!uid || !week) return;
     const data: any = {};
@@ -62,11 +82,12 @@ export default function PlanBoard({ week }: PlanBoardProps) {
     await setDoc(doc(db, "plans", uid, "weeks", String(week)), data);
   };
 
-  const handleAddCard = (dayIdx: number) => {
+  const handleAddCard = async (dayIdx: number) => {
     setCurrentDay(dayIdx);
     setForm({ title: "", content: "", time: "", deadline: "" });
     setEditIdx(null);
     setOpen(true);
+    await fetchOpdrachten();
   };
 
   const handleEditCard = (dayIdx: number, cardIdx: number) => {
@@ -74,6 +95,7 @@ export default function PlanBoard({ week }: PlanBoardProps) {
     setForm({ ...cards[dayIdx][cardIdx] });
     setEditIdx(cardIdx);
     setOpen(true);
+    fetchOpdrachten();
   };
 
   const handleDeleteCard = async (dayIdx: number, cardIdx: number) => {
@@ -87,13 +109,25 @@ export default function PlanBoard({ week }: PlanBoardProps) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleTitleClick = () => {
+    if (opdrachtList.length > 0) setShowOpdrachtSelect(true);
+  };
+
+  const handleSelectOpdracht = (opdracht: OpdrachtCard) => {
+    setForm(f => ({
+      ...f,
+      title: opdracht.title,
+      content: opdracht.content,
+      deadline: opdracht.deadline
+    }));
+    setShowOpdrachtSelect(false);
+  };
+
   const handleSave = async () => {
     const newCards = [...cards];
     if (editIdx !== null) {
-      // 编辑
       newCards[currentDay][editIdx] = { ...form };
     } else {
-      // 新增
       newCards[currentDay].push({ ...form });
     }
     setCards(newCards);
@@ -102,7 +136,6 @@ export default function PlanBoard({ week }: PlanBoardProps) {
     await savePlansToFirestore(newCards);
   };
 
-  // 拖拽移动卡片
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
     const { source, destination } = result;
@@ -161,7 +194,6 @@ export default function PlanBoard({ week }: PlanBoardProps) {
                   }}
                 >
                   <Typography variant="h5" sx={{ fontFamily: "cursive", mb: 1 }}>{day}</Typography>
-                  <Typography variant="body2" sx={{ mb: 2 }}>totaal uur</Typography>
                   <Box sx={{ width: "100%", flex: 1, mb: 2, overflowY: "auto" }}>
                     {cards[idx].map((card, i) => (
                       <Draggable draggableId={`${idx}-${i}`} index={i} key={`${idx}-${i}`}>
@@ -218,16 +250,52 @@ export default function PlanBoard({ week }: PlanBoardProps) {
       <Dialog open={open} onClose={() => { setOpen(false); setEditIdx(null); }}>
         <DialogTitle>{editIdx !== null ? "Bewerk taak" : "Nieuwe taak"}</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <TextField label="Titel" name="title" value={form.title} onChange={handleFormChange} />
+          <TextField
+            label="Titel"
+            name="title"
+            value={form.title}
+            onChange={handleFormChange}
+            onClick={handleTitleClick}
+            InputProps={{
+              readOnly: false,
+              style: { cursor: "pointer" }
+            }}
+            placeholder="Klik om opdracht te kiezen of vul handmatig in"
+          />
           <TextField label="Beschrijving" name="content" value={form.content} onChange={handleFormChange} multiline />
-          <TextField label="Tijd" name="time" value={form.time} onChange={handleFormChange} placeholder="如 15:00-16:00" />
-          <TextField label="Deadline" name="deadline" value={form.deadline} onChange={handleFormChange} placeholder="如 1 Juli" />
+          <TextField label="Tijd" name="time" value={form.time} onChange={handleFormChange} placeholder="15:00-16:00" />
+          <TextField label="Deadline" name="deadline" value={form.deadline} onChange={handleFormChange} placeholder="1 Juli" />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { setOpen(false); setEditIdx(null); }}>Cancel</Button>
           <Button onClick={handleSave} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
+      {/* 选择opdracht弹窗 */}
+      <Dialog open={showOpdrachtSelect} onClose={() => setShowOpdrachtSelect(false)}>
+        <DialogTitle>Kies Opdracht</DialogTitle>
+        <DialogContent>
+          <List>
+            {opdrachtList.length === 0 && (
+              <ListItem>
+                <ListItemText primary="Geen opdracht" />
+              </ListItem>
+            )}
+            {opdrachtList.map((opdracht) => (
+              <ListItem disablePadding key={opdracht.id}>
+                <ListItemButton onClick={() => handleSelectOpdracht(opdracht)}>
+                  <ListItemText
+                    primary={opdracht.title}
+                    secondary={`Deadline: ${opdracht.deadline}`}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
-}
+});
+
+export default PlanBoard;
