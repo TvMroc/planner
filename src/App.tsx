@@ -1,10 +1,9 @@
 import { Grid, Paper, Typography } from "@mui/material"
-import LoginModal from "./login"
-import Weken from "./component/Weken"
+import LoginModal from "./components/login"
+import Weken from "./components/Weken"
 import { useState } from "react";
-import { getWeek } from "./component/Methods";
-import PlanBoard from "./component/Plannen";
-
+import { getWeek } from "./components/DateFormatter";
+import PlanBoard from "./components/Plannen";
 
 
 function App() {

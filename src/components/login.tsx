@@ -31,6 +31,7 @@ const LoginModal: React.FC = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       // 获取 Firestore 里的 nickname
       const uid = userCredential.user.uid;
+      localStorage.uid = uid;
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
         setNickname(userDoc.data().nickname);
