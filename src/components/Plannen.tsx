@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Paper, Typography, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import { Box, Button, Paper, Typography, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Chip } from "@mui/material";
 import { db, auth } from "./firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -131,40 +131,20 @@ export default function PlanBoard({ week }: PlanBoardProps) {
       }}
     >
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Box
-          sx={{
-            display: "flex",
-            width: "max-content",
-            gap: 2,
-            height: "100%",
-            alignItems: "stretch"
-          }}
-        >
+        <Box sx={{ display: "flex", width: "max-content", gap: 2, height: "100%", alignItems: "stretch" }}>
           {days.map((day, idx) => (
-            <Droppable droppableId={String(idx)} key={day}>
-              {(provided) => (
-                <Paper
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  sx={{
-                    flex: "0 0 240px",
-                    background: "#222",
-                    color: "#fff",
-                    borderRadius: 3,
-                    p: 2,
-                    height: "100%",
-                    minHeight: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    boxSizing: "border-box"
-                  }}
-                >
-                  <Typography variant="h5" sx={{ fontFamily: "cursive", mb: 1 }}>{day}</Typography>
-                  <Typography variant="body2" sx={{ mb: 2 }}>totaal uur</Typography>
-                  <Box sx={{ width: "100%", flex: 1, mb: 2, overflowY: "auto" }}>
+            <Paper key={day} sx={{ flex: "0 0 240px", background: "#222", color: "#fff", borderRadius: 3, p: 2, height: "100%", minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", boxSizing: "border-box" }}>
+              <Typography variant="h5" sx={{ fontFamily: "cursive", mb: 1 }}>{day}</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>totaal uur</Typography>
+              <Droppable droppableId={String(idx)}>
+                {(provided) => (
+                  <Box
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    sx={{ width: "100%", flex: 1, mb: 2, overflowY: "auto", display: "flex", flexDirection: "column" }}
+                  >
                     {cards[idx].map((card, i) => (
-                      <Draggable draggableId={`${idx}-${i}`} index={i} key={`${idx}-${i}`}>
+                      <Draggable draggableId={`${idx}-${i}-${card.title}`} index={i} key={`${idx}-${i}-${card.title}`}>
                         {(provided, snapshot) => (
                           <Paper
                             ref={provided.innerRef}
@@ -191,27 +171,27 @@ export default function PlanBoard({ week }: PlanBoardProps) {
                             </Box>
                             <Typography variant="caption" sx={{ color: "#c00" }}>{card.deadline}</Typography>
                             <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>{card.title}</Typography>
-                            <Typography variant="body2">{card.content}</Typography>
+                            <Typography variant="body2" noWrap maxWidth={'10vw'}>{card.content}</Typography>
                             <Typography variant="caption" sx={{ color: "#666" }}>{card.time}</Typography>
                           </Paper>
                         )}
                       </Draggable>
                     ))}
                     {provided.placeholder}
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "#ccc", color: "#222", fontFamily: "cursive", width: "100%",
+                        borderRadius: 8, mt: "auto", "&:hover": { background: "#bbb" }
+                      }}
+                      onClick={() => handleAddCard(idx)}
+                    >
+                      + taak
+                    </Button>
                   </Box>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      background: "#ccc", color: "#222", fontFamily: "cursive", width: "100%",
-                      borderRadius: 8, mt: "auto", "&:hover": { background: "#bbb" }
-                    }}
-                    onClick={() => handleAddCard(idx)}
-                  >
-                    + taak
-                  </Button>
-                </Paper>
-              )}
-            </Droppable>
+                )}
+              </Droppable>
+            </Paper>
           ))}
         </Box>
       </DragDropContext>

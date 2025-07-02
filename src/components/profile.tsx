@@ -1,5 +1,6 @@
 import React from "react";
 import { Backdrop, Paper, Typography, Button } from "@mui/material";
+import Raster from "./Raster";
 
 interface ProfileModalProps {
   open: boolean;
@@ -30,6 +31,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ open, nickname, onLogout, o
     >
       <Typography variant="h5" sx={{ color: "#111" }}>Profile</Typography>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>Nickname: {nickname}</Typography>
+      <Raster />
       <Button
         onClick={onLogout}
         sx={{ color: "#fff", backgroundColor: "#222", '&:hover': { backgroundColor: "#444" }, width: "100%" }}
