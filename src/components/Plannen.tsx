@@ -159,6 +159,7 @@ const PlanBoard = forwardRef(function PlanBoard({ week }: PlanBoardProps, ref) {
         height: "100%",
         overflowX: "auto",
         overflowY: "hidden",
+        scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,0,0,0.1) transparent',
         p: 2,
         boxSizing: "border-box"
       }}
