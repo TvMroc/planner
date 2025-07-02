@@ -4,7 +4,7 @@ import { db, auth } from "./firebase";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 interface OpdrachtCard {
   id: string;
@@ -119,7 +119,7 @@ export default function OpdrachtPanel() {
           <TextField label="Contact" name="content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} multiline />=
             <DatePicker
               label="Deadline"
-              value={form.deadline ? new Dayjs(form.deadline) : null}
+              value={form.deadline ? dayjs(form.deadline) : null}
               onChange={date => {
                 setForm(f => ({
                   ...f,
