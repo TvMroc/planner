@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Backdrop, Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Typography } from "@mui/material";
+import { Backdrop, Box, Button, Card, FormControl, InputLabel, MenuItem, Paper, Select, Typography } from "@mui/material";
 import { setDoc, doc, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { TimePicker } from "@mui/x-date-pickers";
@@ -64,22 +64,22 @@ const Raster = () => {
         <Backdrop sx={{ color: "#222", backgroundColor: "rgba(0,0,0,0.7)", zIndex: 99}} open={open} onClick={() => setOpen(false)}>
             <Paper onClick={e => e.stopPropagation()} sx={{ padding: 2}}>
                 <Typography variant="h5" gutterBottom>Plan when you can work</Typography>
-                <Box sx={{display: 'flex', gap: 2}}>
+                <Box sx={{display: 'flex', gap: 2, justifyContent: 'space-evenly'}}>
                     {days.map((day, index) => (
-                    <div key={index}>
+                    <Paper key={index} sx={{padding: 1}}>
                         <Typography>{day}</Typography>
                         {raster?.items.filter(i => i.day === index).map((item, id) => (
-                        <div key={id} style={{ padding: "0 10px", border: "1px solid #ccc", margin: "3px 0" }}>
+                        <Card key={id} style={{ padding: "0 5px", margin: "3px 0" }}>
                             <p>Start: {item.start.toDate().toLocaleTimeString()}</p>
                             <p>End: {item.end.toDate().toLocaleTimeString()}</p>
-                        </div>
+                        </Card>
                         ))}
-                    </div>))}
+                    </Paper>))}
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'} mt={2} maxWidth={500} flexWrap={'wrap'}>
-                    <TimePicker value={start} onChange={(value) => setStart(dayjs(value))} />
+                <Box display={'flex'} justifyContent={'space-between'} mt={2} maxWidth={1000} gap={2} flexWrap={'wrap'}>
+                    <TimePicker  value={start} onChange={(value) => setStart(dayjs(value))} />
                     <TimePicker value={end} onChange={(value) => setEnd(dayjs(value))} />
-                    <FormControl fullWidth>
+                    <FormControl>
                         <InputLabel id="day-select-label">Day</InputLabel>
                         <Select labelId="day-select-label" id="day-select" value={day} label="Day" onChange={(e) => setDay(e.target.value)}> 
                             {days.map((day, index) => <MenuItem value={index}>{day}</MenuItem>)}

@@ -60,7 +60,7 @@ export default function OpdrachtPanel() {
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>Opdrachten</Typography>
         <Button variant="contained" size="small" onClick={() => setOpen(true)} sx={{ marginRight: 2 }}  >
-          + Add taak
+          + Add opdracht
         </Button>
       </Box>
       <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
@@ -72,12 +72,13 @@ export default function OpdrachtPanel() {
               maxWidth: 200,
               minHeight: 100,
               p: 2,
-              background: "#fff",
+              background: "#272727",
               boxShadow: 1,
               borderRadius: 2,
               cursor: "pointer",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              color: '#fff',
               whiteSpace: "nowrap"
             }}
             onClick={() => handleShowDetail(opdracht)}
@@ -88,7 +89,7 @@ export default function OpdrachtPanel() {
                 fontWeight: "bold",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                whiteSpace: "nowrap"
+                whiteSpace: "nowrap",
               }}
               title={opdracht.title}
             >
@@ -113,7 +114,7 @@ export default function OpdrachtPanel() {
         ))}
       </Box>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Add Taak</DialogTitle>
+        <DialogTitle>Add Opdracht</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <TextField label="Title" name="title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           <TextField label="Contact" name="content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} multiline />=
