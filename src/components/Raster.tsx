@@ -77,8 +77,8 @@ const Raster = () => {
                     </div>))}
                 </Box>
                 <Box display={'flex'} justifyContent={'space-between'} mt={2} maxWidth={500} flexWrap={'wrap'}>
-                    <TimePicker value={start} onChange={(value) => setStart(value)} />
-                    <TimePicker value={end} onChange={(value) => setEnd(value)} />
+                    <TimePicker value={start} onChange={(value) => setStart(dayjs(value))} />
+                    <TimePicker value={end} onChange={(value) => setEnd(dayjs(value))} />
                     <FormControl fullWidth>
                         <InputLabel id="day-select-label">Day</InputLabel>
                         <Select labelId="day-select-label" id="day-select" value={day} label="Day" onChange={(e) => setDay(e.target.value)}> 

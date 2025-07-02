@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Paper, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import { db, auth } from "./firebase";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { nl } from "date-fns/locale/nl"; 
+import { Dayjs } from "dayjs";
 
 interface OpdrachtCard {
   id: string;
@@ -118,11 +116,10 @@ export default function OpdrachtPanel() {
         <DialogTitle>Add Taak</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <TextField label="Title" name="title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-          <TextField label="Contact" name="content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} multiline />
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={nl}>
+          <TextField label="Contact" name="content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} multiline />=
             <DatePicker
               label="Deadline"
-              value={form.deadline ? new Date(form.deadline) : null}
+              value={form.deadline ? new Dayjs(form.deadline) : null}
               onChange={date => {
                 setForm(f => ({
                   ...f,
@@ -137,7 +134,6 @@ export default function OpdrachtPanel() {
                 }
               }}
             />
-          </LocalizationProvider>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
